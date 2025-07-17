@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Swag</title>
-    <link rel="icon" href="https://i.postimg.cc/L4gvkL5s/477393825-122230385906031403-344.jpg" />
+    <link rel="icon" id="favicon" href="https://i.postimg.cc/L4gvkL5s/477393825-122230385906031403-344.jpg" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,7 +117,8 @@
     document.addEventListener('DOMContentLoaded', () => {
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwa8sfY8NsoLEnez3VI04wwlRAWa7NH6FgUqfZhdwm_CTrwBYavsQZ57-k6zS4t9EGC/exec";
         
-        let allProducts = [], cart = JSON.parse(localStorage.getItem('Premium SwagCart')) || [], selectedProduct = null, selectedSize = null;
+        // --- FIX 1: Added `currentLightboxIndex` here ---
+        let allProducts = [], cart = JSON.parse(localStorage.getItem('Premium SwagCart')) || [], selectedProduct = null, selectedSize = null, currentLightboxIndex = 0;
 
         const views = { home: document.getElementById('home-view'), product: document.getElementById('product-view'), cart: document.getElementById('cart-view'), checkout: document.getElementById('checkout-view') };
         
@@ -346,7 +347,7 @@
             addProductSchema(product);
 
             document.getElementById('product-page-title').textContent = product.Name;
-            document.getElementById('product-page-price').innerHTML = `<p class="text-3xl font-bold text-teal-600">৳${product.Price.toLocaleString()}</p>${product['Compare-at price'] ? `<p class="text-xl text-red-500 line-through font-bold">৳${p['Compare-at price'].toLocaleString()}</p>` : ''}`;
+            document.getElementById('product-page-price').innerHTML = `<p class="text-3xl font-bold text-teal-600">৳${product.Price.toLocaleString()}</p>${product['Compare-at price'] ? `<p class="text-xl text-red-500 line-through font-bold">৳${product['Compare-at price'].toLocaleString()}</p>` : ''}`;
             document.getElementById('product-page-desc').innerHTML = product.Description.replace(/\n/g, '<br>');
             renderImageGallery(product.Images);
             const sizeSection = document.getElementById('size-section'), sizeOptions = document.getElementById('size-options');
@@ -460,12 +461,13 @@
             const thumbnailContainer = document.getElementById('thumbnail-container');
             if(!thumbnailContainer) return;
             thumbnailContainer.innerHTML = '';
-            let currentLightboxIndex = 0;
             images.forEach((src, index) => {
                 const thumb = document.createElement('img');
                 thumb.src = src;
                 thumb.className = 'thumbnail-img w-20 h-auto md:w-24 md:h-auto object-cover cursor-pointer rounded';
-                thumb.onclick = () => { updateMainImage(src, thumb); currentLightboxIndex = index; };
+                thumb.onclick = () => {
+                    updateMainImage(src, thumb);
+                };
                 thumbnailContainer.appendChild(thumb);
             });
             if (images.length > 0) { updateMainImage(images[0], thumbnailContainer.children[0]); }
@@ -473,7 +475,8 @@
         const updateMainImage = (src, activeThumb) => { document.getElementById('main-product-image').src = src; Array.from(document.getElementById('thumbnail-container').children).forEach(c => c.classList.remove('active')); activeThumb.classList.add('active'); };
         
         const openLightbox = (index) => {
-            let currentLightboxIndex = index;
+            // --- FIX 2: Modified to use global `currentLightboxIndex` ---
+            currentLightboxIndex = index;
             const lightboxImage = document.getElementById('lightbox-image');
             const lightboxModal = document.getElementById('lightbox-modal');
             lightboxImage.src = selectedProduct.Images[currentLightboxIndex]; 
@@ -486,8 +489,24 @@
              openLightbox(index);
         });
         document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
-        document.getElementById('lightbox-next').addEventListener('click', () => {});
-        document.getElementById('lightbox-prev').addEventListener('click', () => {});
+
+        // --- FIX 3: Added logic for next and previous buttons ---
+        document.getElementById('lightbox-next').addEventListener('click', () => {
+            if (!selectedProduct || !selectedProduct.Images || selectedProduct.Images.length === 0) return;
+            currentLightboxIndex++;
+            if (currentLightboxIndex >= selectedProduct.Images.length) {
+                currentLightboxIndex = 0; // Loop to first image
+            }
+            document.getElementById('lightbox-image').src = selectedProduct.Images[currentLightboxIndex];
+        });
+        document.getElementById('lightbox-prev').addEventListener('click', () => {
+            if (!selectedProduct || !selectedProduct.Images || selectedProduct.Images.length === 0) return;
+            currentLightboxIndex--;
+            if (currentLightboxIndex < 0) {
+                currentLightboxIndex = selectedProduct.Images.length - 1; // Loop to last image
+            }
+            document.getElementById('lightbox-image').src = selectedProduct.Images[currentLightboxIndex];
+        });
 
         const showAlert = (message, isSuccess = false) => {
             const alertPopup = document.getElementById('alert-popup');
