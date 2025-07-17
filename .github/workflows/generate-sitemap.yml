@@ -1,0 +1,27 @@
+name: Generate and Commit Sitemap
+
+on:
+  workflow_dispatch: # Manual trigger
+  schedule:
+    - cron: '0 0 * * *' # Proti din midnight (UTC) shomoye cholbe
+
+jobs:
+  build-sitemap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Fetch Sitemap Content
+        run: |
+          # Nicher URL-ti oboshshoi apnar nijer Apps Script sitemap URL diye replace korben
+          curl -L "https://script.google.com/macros/s/AKfycbwa8sfY8NsoLEnez3VI04wwlRAWa7NH6FgUqfZhdwm_CTrwBYavsQZ57-k6zS4t9EGC/exec?action=sitemap" -o sitemap.xml
+      
+      - name: Commit and Push Sitemap
+        run: |
+          git config --global user.name "Sitemap Bot"
+          git config --global user.email "sitemap-bot@users.noreply.github.com"
+          git add sitemap.xml
+          # Poriborton thaklei shudhu commit korbe
+          git diff --staged --quiet || git commit -m "Automated sitemap update"
+          git push
