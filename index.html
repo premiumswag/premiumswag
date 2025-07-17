@@ -56,6 +56,12 @@
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
         }
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration {
+          -webkit-appearance:none;
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -69,20 +75,40 @@
 
     <header id="page-header" class="bg-white shadow-md sticky top-0 z-40">
         <nav class="container mx-auto px-4 sm:px-6 h-20 flex items-center">
-            <a href="#home" onclick="handleNav(event, '#home')" class="text-3xl font-orbitron font-bold text-black">Premium Swag</a>
+            <a href="#home" onclick="handleNav(event, '#home')" class="text-xl font-orbitron font-bold text-black flex-shrink-0">Premium Swag</a>
+            
             <div class="flex-grow"></div>
-            <div class="hidden md:flex items-center space-x-4" id="desktop-menu-container"></div>
-            <div class="flex-grow"></div>
-            <div class="flex items-center space-x-4">
-                <a href="#cart" onclick="handleNav(event, '#cart')" class="relative text-gray-600 hover:text-teal-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg><span id="cart-count" class="absolute -top-2 -right-2 bg-teal-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span></a>
-                <button id="mobile-menu-button" class="md:hidden text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg></button>
+            
+             <div class="hidden md:flex items-center space-x-4" id="desktop-menu-container"></div>
+            <div class="flex-grow hidden md:block"></div>
+
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <div id="search-container" class="relative flex items-center">
+                    <input type="search" id="product-search-input" class="w-0 p-0 border-transparent rounded-full transition-all duration-300 ease-in-out opacity-0 focus:outline-none focus:ring-2 focus:ring-teal-400" placeholder="Search...">
+                    <button id="search-icon-button" class="text-gray-600 hover:text-teal-500 p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </div>
+
+                <a href="#cart" onclick="handleNav(event, '#cart')" class="relative text-gray-600 hover:text-teal-500 p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-teal-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+                
+                <button id="mobile-menu-button" class="md:hidden text-gray-600 p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
             </div>
         </nav>
         <div id="mobile-menu" class="hidden md:hidden bg-white"></div>
     </header>
 
     <div id="app-content">
-        <main id="home-view" class="hidden container mx-auto px-4 sm:px-6 py-12"><h1 id="page-title" class="text-3xl font-bold text-center mb-10">All Products</h1><div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8"></div></main>
+        <main id="home-view" class="hidden container mx-auto px-4 sm:px-6 py-12">
+            <h1 id="page-title" class="text-3xl font-bold text-center mb-10">All Products</h1>
+            <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8"></div>
+        </main>
         <main id="product-view" class="hidden container mx-auto px-4 sm:px-6 py-12"><div class="mb-6"><a href="#" onclick="handleNav(event, '#home')" class="text-teal-600 hover:underline">&larr; Back to all products</a></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"><div class="flex flex-col-reverse md:flex-row gap-4"><div id="thumbnail-container" class="thumbnail-container flex md:flex-col gap-2 overflow-x-auto md:overflow-x-hidden md:h-[500px] lg:h-[600px]"></div><div class="relative flex-1"><img id="main-product-image" src="" alt="Product" class="w-full h-auto object-contain rounded-lg shadow-md cursor-pointer"></div></div><div class="w-full"><h1 id="product-page-title" class="text-xl md:text-2xl font-bold mb-2"></h1><div id="product-page-price" class="flex items-baseline space-x-3 mb-6"></div><div id="size-section" class="mb-6 hidden"><h3 class="font-semibold mb-3 text-lg">Size:</h3><div id="size-options" class="flex flex-wrap gap-3"></div></div><div class="space-y-4 mt-6"><button id="add-to-cart-btn" class="w-full bg-teal-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-teal-600 transition duration-300">Add to Cart</button><button id="buy-now-btn" class="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold text-lg hover:bg-black transition duration-300">Buy It Now</button></div><div class="mt-8"><h3 class="font-semibold text-xl mb-2 border-b pb-2">Description</h3><div id="product-page-desc" class="text-base text-gray-600 mt-4 leading-relaxed prose"></div></div></div></div></main>
         <main id="cart-view" class="hidden container mx-auto px-4 sm:px-6 py-12"><h1 class="text-3xl font-bold text-center mb-10">Your Shopping Cart</h1><div id="cart-items-container" class="bg-white p-6 rounded-lg shadow-md"></div></main>
         <main id="checkout-view" class="hidden container mx-auto px-4 sm:px-6 py-12"><h1 class="text-3xl font-bold text-center mb-10">Checkout</h1><div class="grid grid-cols-1 lg:grid-cols-2 gap-12"><div class="bg-white p-8 rounded-lg shadow-md"><h2 class="text-2xl font-semibold mb-6">Shipping Information</h2><form id="checkout-form" class="space-y-4"><div><label for="name" class="block text-sm font-medium">Name</label><input type="text" id="name" required class="mt-1 block w-full rounded-md border border-gray-400 shadow-sm focus:border-teal-500 focus:ring-teal-500"></div><div><label for="phone" class="block text-sm font-medium">Phone Number</label><input type="tel" id="phone" required pattern="\d{11}" title="Please enter an 11-digit phone number" class="mt-1 block w-full rounded-md border border-gray-400 shadow-sm focus:border-teal-500 focus:ring-teal-500"></div><div><label for="address" class="block text-sm font-medium">Address</label><textarea id="address" rows="3" required class="mt-1 block w-full rounded-md border border-gray-400 shadow-sm focus:border-teal-500 focus:ring-teal-500"></textarea></div><div><label for="delivery-zone" class="block text-sm font-medium">Delivery Zone</label><select id="delivery-zone" required class="mt-1 block w-full rounded-md border border-gray-400 shadow-sm focus:border-teal-500 focus:ring-teal-500"></select></div></form></div><div class="bg-white p-8 rounded-lg shadow-md"><h2 class="text-2xl font-semibold mb-6">Order Summary</h2><div id="checkout-summary-items" class="space-y-4"></div><div class="border-t mt-6 pt-6 space-y-3"><div class="flex justify-between text-lg"><p>Subtotal</p><p id="summary-subtotal">৳0</p></div><div class="flex justify-between text-lg"><p>Shipping</p><p id="summary-shipping">৳0</p></div><div class="flex justify-between font-bold text-xl"><p>Total</p><p id="summary-total">৳0</p></div></div><button id="complete-order-btn" type="submit" form="checkout-form" class="w-full mt-8 bg-teal-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-teal-600 transition duration-300 flex items-center justify-center disabled:opacity-50"><span class="btn-text">Complete Order</span><svg class="animate-spin h-5 w-5 ml-3 hidden btn-loader" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></button></div></div></main>
@@ -135,12 +161,13 @@
                 renderCategories(products);
                 renderDeliveryZones(deliveryCharges);
                 updateCartCount();
+                setupSearch(); // Set up the interactive search
                 handleRouteChange();
             } catch (error) {
                 showAlert(error.message);
             } finally {
                 globalLoader.style.display = 'none';
-                document.getElementById('app-content').style.opacity = 1; // Make content visible
+                document.getElementById('app-content').style.opacity = 1;
                 document.getElementById('footer').classList.add('footer-visible');
                 document.getElementById('copyright-year').textContent = new Date().getFullYear();
             }
@@ -151,14 +178,81 @@
             const decodedHash = decodeURIComponent(hash);
             const [route, param] = decodedHash.substring(1).split('/');
             Object.values(views).forEach(view => view.classList.add('hidden'));
-            let productsToRender = allProducts, pageTitle = "All Products";
-            if (route === 'category' && param) { productsToRender = allProducts.filter(p => p.Category === param); pageTitle = param; }
-            if (route === 'home' || route === 'category') { views.home.classList.remove('hidden'); renderProductGrid(productsToRender); document.getElementById('page-title').textContent = pageTitle; } 
-            else if (route === 'product' && param) { selectedProduct = allProducts.find(p => p.SKU == param); if (selectedProduct) { views.product.classList.remove('hidden'); renderProductPage(selectedProduct); } else { window.location.hash = '#home'; } } 
-            else if (route === 'cart') { views.cart.classList.remove('hidden'); renderCartPage(); } 
-            else if (route === 'checkout') { views.checkout.classList.remove('hidden'); renderCheckoutPage(); } 
-            else { views.home.classList.remove('hidden'); renderProductGrid(allProducts); }
+            
+            let productsToRender = allProducts;
+            let pageTitle = "All Products";
+
+            if (route === 'category' && param) {
+                productsToRender = allProducts.filter(p => p.Category === param);
+                pageTitle = param;
+            }
+
+            const searchTerm = document.getElementById('product-search-input').value.toLowerCase();
+            if (searchTerm) {
+                productsToRender = productsToRender.filter(p => p.Name.toLowerCase().includes(searchTerm));
+            }
+            
+            if (route === 'home' || route === 'category') {
+                views.home.classList.remove('hidden');
+                renderProductGrid(productsToRender);
+                document.getElementById('page-title').textContent = pageTitle;
+            } else if (route === 'product' && param) {
+                selectedProduct = allProducts.find(p => p.SKU == param);
+                if (selectedProduct) {
+                    views.product.classList.remove('hidden');
+                    renderProductPage(selectedProduct);
+                } else {
+                    window.location.hash = '#home';
+                }
+            } else if (route === 'cart') {
+                views.cart.classList.remove('hidden');
+                renderCartPage();
+            } else if (route === 'checkout') {
+                views.checkout.classList.remove('hidden');
+                renderCheckoutPage();
+            } else {
+                views.home.classList.remove('hidden');
+                renderProductGrid(allProducts);
+            }
             window.scrollTo(0, 0);
+        };
+        
+        // MODIFIED: New function to handle the pop-out search logic
+        const setupSearch = () => {
+            const searchContainer = document.getElementById('search-container');
+            const searchInput = document.getElementById('product-search-input');
+            const searchButton = document.getElementById('search-icon-button');
+
+            const openSearch = () => {
+                searchInput.classList.remove('w-0', 'p-0', 'border-transparent', 'opacity-0');
+                searchInput.classList.add('w-36', 'sm:w-48', 'py-1', 'px-3', 'border-gray-300', 'opacity-100');
+                searchInput.focus();
+            };
+
+            const closeSearch = () => {
+                searchInput.classList.add('w-0', 'p-0', 'border-transparent', 'opacity-0');
+                searchInput.classList.remove('w-36', 'sm:w-48', 'py-1', 'px-3', 'border-gray-300', 'opacity-100');
+                searchInput.blur();
+            };
+            
+            searchButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if(searchInput.classList.contains('w-0')) {
+                    openSearch();
+                } else {
+                    closeSearch();
+                }
+            });
+
+            // The main filter logic on typing
+            searchInput.addEventListener('input', handleRouteChange);
+            
+            // Close search bar if clicking outside of it
+            document.addEventListener('click', (e) => {
+                if (!searchContainer.contains(e.target)) {
+                    closeSearch();
+                }
+            });
         };
 
         const renderProductGrid = (products) => {
@@ -177,7 +271,7 @@
                     </div>
                 </a>`).join('');
         };
-
+        
         const renderProductPage = (product) => {
             document.getElementById('product-page-title').textContent = product.Name;
             document.getElementById('product-page-price').innerHTML = `<p class="text-3xl font-bold text-teal-600">৳${product.Price.toLocaleString()}</p>${product['Compare-at price'] ? `<p class="text-xl text-red-500 line-through font-bold">৳${product['Compare-at price'].toLocaleString()}</p>` : ''}`;
@@ -197,7 +291,6 @@
                     }
                 });
             }
-            // Meta Pixel ViewContent Event
             if (typeof fbq === 'function') {
                 fbq('track', 'ViewContent', {
                     content_name: product.Name,
@@ -213,13 +306,11 @@
             const allCategories = [...new Set(products.map(p => p.Category))].filter(Boolean);
             const clothingSubCategories = ['Stitched', 'Unstitched'];
             const otherCategories = allCategories.filter(cat => !clothingSubCategories.includes(cat));
-
             const desktopContainer = document.getElementById('desktop-menu-container');
             let desktopHTML = `<a href="#home" onclick="handleNav(event, '#home')" class="text-gray-600 hover:text-teal-500 transition duration-300">All Products</a>`;
             desktopHTML += `<div class="relative group"><button class="text-gray-600 hover:text-teal-500 transition duration-300 flex items-center py-2">Clothing<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button><div class="absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-0 py-2 w-40 z-10 top-full"><a href="#category/Stitched" onclick="handleNav(event, '#category/Stitched')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50">Stitched</a><a href="#category/Unstitched" onclick="handleNav(event, '#category/Unstitched')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50">Unstitched</a></div></div>`;
             desktopHTML += otherCategories.map(cat => `<a href="#category/${cat}" onclick="handleNav(event, '#category/${cat}')" class="text-gray-600 hover:text-teal-500 transition duration-300">${cat}</a>`).join('');
-            desktopContainer.innerHTML = desktopHTML;
-
+            if(desktopContainer) desktopContainer.innerHTML = desktopHTML;
             const mobileContainer = document.getElementById('mobile-menu');
             let mobileHTML = `<a href="#home" onclick="handleNav(event, '#home')" class="block py-2 px-6 text-sm hover:bg-teal-50">All Products</a>`;
             mobileHTML += `<div><button id="mobile-clothing-toggle" class="w-full flex justify-between items-center py-2 px-6 text-sm hover:bg-teal-50"><span>Clothing</span><svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button><div id="mobile-clothing-submenu" class="hidden pl-4"><a href="#category/Stitched" onclick="handleNav(event, '#category/Stitched')" class="block py-2 pl-6 text-sm hover:bg-teal-50">Stitched</a><a href="#category/Unstitched" onclick="handleNav(event, '#category/Unstitched')" class="block py-2 pl-6 text-sm hover:bg-teal-50">Unstitched</a></div></div>`;
@@ -227,11 +318,14 @@
                 mobileHTML += `<div class="border-t my-2"></div>`;
                 mobileHTML += otherCategories.map(cat => `<a href="#category/${cat}" onclick="handleNav(event, '#category/${cat}')" class="block py-2 px-6 text-sm hover:bg-teal-50">${cat}</a>`).join('');
             }
-            mobileContainer.innerHTML = mobileHTML;
-            document.getElementById('mobile-clothing-toggle').addEventListener('click', (e) => {
-                e.currentTarget.querySelector('svg').classList.toggle('rotate-180');
-                document.getElementById('mobile-clothing-submenu').classList.toggle('hidden');
-            });
+            if(mobileContainer) mobileContainer.innerHTML = mobileHTML;
+            const mobileClothingToggle = document.getElementById('mobile-clothing-toggle');
+            if(mobileClothingToggle) {
+                mobileClothingToggle.addEventListener('click', (e) => {
+                    e.currentTarget.querySelector('svg').classList.toggle('rotate-180');
+                    document.getElementById('mobile-clothing-submenu').classList.toggle('hidden');
+                });
+            }
         };
         
         const renderDeliveryZones = (charges) => {
@@ -349,7 +443,6 @@
             saveCart();
             updateCartCount();
             showAlert('Added to cart!', true);
-            // Meta Pixel AddToCart Event
             if (typeof fbq === 'function') {
                 fbq('track', 'AddToCart', {
                     content_name: selectedProduct.Name,
@@ -392,7 +485,6 @@
                 const result = await response.json();
                 if (result.status !== 'success') throw new Error(result.message);
                 
-                // Meta Pixel Purchase Event
                 if (typeof fbq === 'function') {
                     fbq('track', 'Purchase', {
                         value: result.data.totalAmount,
@@ -416,7 +508,6 @@
             }
         });
         
-        // Add event listener for InitiateCheckout
         document.body.addEventListener('click', (e) => {
             if (e.target && e.target.id === 'proceed-to-checkout-btn') {
                 if (typeof fbq === 'function' && cart.length > 0) {
@@ -443,7 +534,8 @@
         window.handleNav = (event, path) => {
             event.preventDefault();
             window.location.hash = path;
-            document.getElementById('mobile-menu').classList.add('hidden');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) mobileMenu.classList.add('hidden');
         };
         window.addEventListener('hashchange', handleRouteChange);
         document.getElementById('mobile-menu-button').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
