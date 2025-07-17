@@ -51,7 +51,6 @@
         }
         .group .group-hover\:block { display: none; }
         .group:hover .group-hover\:block { display: block; }
-        /* FOUC Fix */
         #app-content {
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
@@ -61,6 +60,10 @@
         input[type="search"]::-webkit-search-results-button,
         input[type="search"]::-webkit-search-results-decoration {
           -webkit-appearance:none;
+        }
+        /* Style for the search overlay */
+        #search-overlay {
+            transition: opacity 0.3s ease-in-out;
         }
     </style>
 </head>
@@ -74,28 +77,19 @@
     </div>
 
     <header id="page-header" class="bg-white shadow-md sticky top-0 z-40">
-        <nav class="container mx-auto px-4 sm:px-6 h-20 flex items-center">
+        <nav class="container mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
             <a href="#home" onclick="handleNav(event, '#home')" class="text-xl font-orbitron font-bold text-black flex-shrink-0">Premium Swag</a>
             
-            <div class="flex-grow"></div>
-            
-             <div class="hidden md:flex items-center space-x-4" id="desktop-menu-container"></div>
-            <div class="flex-grow hidden md:block"></div>
-
+            <div class="hidden md:flex items-center space-x-4 flex-grow justify-center" id="desktop-menu-container"></div>
 
             <div class="flex items-center space-x-2 sm:space-x-3">
-                <div id="search-container" class="relative flex items-center">
-                    <input type="search" id="product-search-input" class="w-0 p-0 border-transparent rounded-full transition-all duration-300 ease-in-out opacity-0 focus:outline-none focus:ring-2 focus:ring-teal-400" placeholder="Search...">
-                    <button id="search-icon-button" class="text-gray-600 hover:text-teal-500 p-1">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </button>
-                </div>
-
+                <button id="search-trigger-button" class="text-gray-600 hover:text-teal-500 p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
                 <a href="#cart" onclick="handleNav(event, '#cart')" class="relative text-gray-600 hover:text-teal-500 p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     <span id="cart-count" class="absolute -top-1 -right-1 bg-teal-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
                 </a>
-                
                 <button id="mobile-menu-button" class="md:hidden text-gray-600 p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
@@ -103,6 +97,15 @@
         </nav>
         <div id="mobile-menu" class="hidden md:hidden bg-white"></div>
     </header>
+
+    <div id="search-overlay" class="hidden fixed top-0 left-0 w-full h-20 bg-white z-50 shadow-md">
+        <div class="container mx-auto px-4 h-full flex items-center justify-between space-x-4">
+             <svg class="w-6 h-6 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+             <input type="search" id="product-search-input" class="w-full h-full text-lg focus:outline-none" placeholder="Search our store">
+             <button id="search-close-button" class="text-gray-600 text-3xl font-light">&times;</button>
+        </div>
+    </div>
+
 
     <div id="app-content">
         <main id="home-view" class="hidden container mx-auto px-4 sm:px-6 py-12">
@@ -161,7 +164,7 @@
                 renderCategories(products);
                 renderDeliveryZones(deliveryCharges);
                 updateCartCount();
-                setupSearch(); // Set up the interactive search
+                setupSearchOverlay(); // Set up the new search overlay
                 handleRouteChange();
             } catch (error) {
                 showAlert(error.message);
@@ -217,42 +220,23 @@
             window.scrollTo(0, 0);
         };
         
-        // MODIFIED: New function to handle the pop-out search logic
-        const setupSearch = () => {
-            const searchContainer = document.getElementById('search-container');
+        // MODIFIED: New function for the Search Overlay
+        const setupSearchOverlay = () => {
+            const searchTrigger = document.getElementById('search-trigger-button');
+            const searchOverlay = document.getElementById('search-overlay');
             const searchInput = document.getElementById('product-search-input');
-            const searchButton = document.getElementById('search-icon-button');
+            const searchClose = document.getElementById('search-close-button');
 
-            const openSearch = () => {
-                searchInput.classList.remove('w-0', 'p-0', 'border-transparent', 'opacity-0');
-                searchInput.classList.add('w-36', 'sm:w-48', 'py-1', 'px-3', 'border-gray-300', 'opacity-100');
+            searchTrigger.addEventListener('click', () => {
+                searchOverlay.classList.remove('hidden');
                 searchInput.focus();
-            };
-
-            const closeSearch = () => {
-                searchInput.classList.add('w-0', 'p-0', 'border-transparent', 'opacity-0');
-                searchInput.classList.remove('w-36', 'sm:w-48', 'py-1', 'px-3', 'border-gray-300', 'opacity-100');
-                searchInput.blur();
-            };
-            
-            searchButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if(searchInput.classList.contains('w-0')) {
-                    openSearch();
-                } else {
-                    closeSearch();
-                }
             });
 
-            // The main filter logic on typing
+            searchClose.addEventListener('click', () => {
+                searchOverlay.classList.add('hidden');
+            });
+
             searchInput.addEventListener('input', handleRouteChange);
-            
-            // Close search bar if clicking outside of it
-            document.addEventListener('click', (e) => {
-                if (!searchContainer.contains(e.target)) {
-                    closeSearch();
-                }
-            });
         };
 
         const renderProductGrid = (products) => {
@@ -274,7 +258,7 @@
         
         const renderProductPage = (product) => {
             document.getElementById('product-page-title').textContent = product.Name;
-            document.getElementById('product-page-price').innerHTML = `<p class="text-3xl font-bold text-teal-600">৳${product.Price.toLocaleString()}</p>${product['Compare-at price'] ? `<p class="text-xl text-red-500 line-through font-bold">৳${product['Compare-at price'].toLocaleString()}</p>` : ''}`;
+            document.getElementById('product-page-price').innerHTML = `<p class="text-3xl font-bold text-teal-600">৳${product.Price.toLocaleString()}</p>${product['Compare-at price'] ? `<p class="text-xl text-red-500 line-through font-bold">৳${p['Compare-at price'].toLocaleString()}</p>` : ''}`;
             document.getElementById('product-page-desc').innerHTML = product.Description.replace(/\n/g, '<br>');
             renderImageGallery(product.Images);
             const sizeSection = document.getElementById('size-section'), sizeOptions = document.getElementById('size-options');
