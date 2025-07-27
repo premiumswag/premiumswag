@@ -217,39 +217,89 @@
                 faviconLoader.stop();
             }
         };
+// Replace your old handleRouteChange function with this new one
+const handleRouteChange = async (isNavigation = false) => {
+    // This function now reads the path from the full URL, not the hash
+    const path = window.location.pathname;
+    const parts = path.split('/').filter(Boolean); // e.g., ['product', '1001']
+    const route = parts[0] || 'home';
+    const param = parts[1];
 
-        const handleRouteChange = async (isNavigation = false) => {
-            const hash = window.location.hash || '#home';
-            const decodedHash = decodeURIComponent(hash);
-            const [route, param] = decodedHash.substring(1).split('/');
-            
-            Object.values(views).forEach(view => {
-                if (!view.classList.contains('hidden')) {
-                     view.classList.add('hidden');
-                }
-            });
-            
-            if (route === 'home' || route === 'category') {
-                views.home.classList.remove('hidden');
-                const pageTitleEl = document.getElementById('page-title');
-                
-                if(isNavigation) {
-                    faviconLoader.start();
-                    pageTitleEl.classList.add('hidden');
-                    renderSkeletons(8);
-                }
+    Object.values(views).forEach(view => {
+        if (!view.classList.contains('hidden')) {
+             view.classList.add('hidden');
+        }
+    });
 
-                let productsToRender = allProducts;
-                let pageTitle = "All Products";
-                if (route === 'category' && param) {
-                    productsToRender = allProducts.filter(p => p.Category === param);
-                    pageTitle = param;
-                }
+    if (route === 'home' || route === 'category') {
+        views.home.classList.remove('hidden');
+        const pageTitleEl = document.getElementById('page-title');
 
-                const searchTerm = document.getElementById('product-search-input').value.toLowerCase();
-                if (searchTerm) {
-                    productsToRender = productsToRender.filter(p => p.Name.toLowerCase().includes(searchTerm));
-                }
+        if(isNavigation) {
+            faviconLoader.start();
+            pageTitleEl.classList.add('hidden');
+            renderSkeletons(8);
+        }
+
+        let productsToRender = allProducts;
+        let pageTitle = "All Products";
+        let isCategoryPage = false;
+
+        // Note: Category path is now /category/Stitched
+        if (route === 'category' && param) {
+            productsToRender = allProducts.filter(p => p.Category === param);
+            pageTitle = param;
+            isCategoryPage = true;
+        }
+
+        const searchTerm = document.getElementById('product-search-input').value.toLowerCase();
+        if (searchTerm) {
+            productsToRender = productsToRender.filter(p => p.Name.toLowerCase().includes(searchTerm));
+        }
+
+        let oldMetaDesc = document.querySelector("meta[name='description']");
+        if (oldMetaDesc) oldMetaDesc.remove();
+        const metaDesc = document.createElement('meta');
+        metaDesc.name = 'description';
+
+        if (isCategoryPage) {
+            document.title = `${pageTitle} Collection - Premium Swag`;
+            const productNames = productsToRender.slice(0, 3).map(p => p.Name).join(', ');
+            metaDesc.content = `Explore our exclusive ${pageTitle} collection at Premium Swag, featuring ${productNames} and more. Shop the latest designs today!`;
+        } else {
+            document.title = 'Premium Swag - Authentic & Stylish Fashion';
+            metaDesc.content = 'Discover authentic and stylish fashion at Premium Swag. We offer a wide range of stitched and unstitched collections to suit your style.';
+        }
+        document.head.appendChild(metaDesc);
+
+        if(isNavigation) await new Promise(res => setTimeout(res, 300));
+
+        renderProductGrid(productsToRender);
+        pageTitleEl.textContent = pageTitle;
+        pageTitleEl.classList.remove('hidden');
+        faviconLoader.stop();
+
+    } else if (route === 'product' && param) {
+        views.product.classList.remove('hidden');
+        selectedProduct = allProducts.find(p => p.SKU == param);
+        if (selectedProduct) {
+            renderProductPage(selectedProduct);
+        } else {
+            window.location.pathname = '/'; // Redirect to home if product not found
+        }
+    } else if (route === 'cart') {
+        views.cart.classList.remove('hidden');
+        renderCartPage();
+    } else if (route === 'checkout') {
+        views.checkout.classList.remove('hidden');
+        renderCheckoutPage();
+    } else {
+        views.home.classList.remove('hidden');
+        renderProductGrid(allProducts);
+    }
+    window.scrollTo(0, 0);
+};
+        
 
                 // Simulate a small delay for better visual feedback when navigating
                 if(isNavigation) await new Promise(res => setTimeout(res, 300));
