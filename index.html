@@ -541,7 +541,8 @@
             cart = [newItem];
             saveCart();
             updateCartCount();
-            window.location.hash = '#checkout';
+            // MODIFIED: Navigate to /checkout instead of #checkout
+            handleNav(null, '/checkout'); 
         });
 
         document.getElementById('checkout-form')?.addEventListener('submit', async (e) => {
@@ -593,12 +594,12 @@
             saveCart();
             updateCartCount();
             document.getElementById('checkout-form').reset();
-            window.location.hash = '#home';
+            window.history.pushState({}, '', '/');
+            handleRouteChange(true);
         });
         
-        // MODIFIED: Updated navigation function
         window.handleNav = (event, path, isNavigation = false) => {
-            event.preventDefault();
+            if(event) event.preventDefault();
             if (window.location.pathname !== path) {
                 window.history.pushState({path}, '', path);
                 handleRouteChange(isNavigation);
@@ -607,7 +608,6 @@
             if (mobileMenu) mobileMenu.classList.add('hidden');
         };
         
-        // MODIFIED: Changed listener to 'popstate'
         window.addEventListener('popstate', () => handleRouteChange(true));
         document.getElementById('mobile-menu-button').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
         
